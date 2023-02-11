@@ -93,7 +93,7 @@ async function makeRequest(url, page = "1") {
         })
         if(response.ok) {
             const data = await response.json()
-            console.log(typeof data)
+            console.log(typeof data, response, data)
             return data
         }
     }
@@ -117,8 +117,6 @@ function clearPagination() {
 
 
 function displayPagination(amount) {
-    console.log(amount)
-    paginationList.innerHTML = ""
     for(let i = 1; i <= amount; i++) {
         const el = document.createElement("li")
         el.innerText =`${String(i)}`
@@ -160,6 +158,10 @@ async function activatePagination() {
 
 makeRequest(API_URL_TOP)
     .then(data => {
+        paginationList.innerHTML = ""
+        return data
+    })
+    .then(data => {
         if(data.pagesCount > 1) {
             displayPagination(
                 data.pagesCount >= 10 
@@ -181,14 +183,18 @@ form.addEventListener('submit', e => {
     if(search.value) {
         makeRequest(API_URL_SEARCH + search.value)
             .then(data => {
+                paginationList.innerHTML = ""
+                return data
+            })
+            .then(data => {
                 if(data.pagesCount > 1) {
                     displayPagination(
                         data.pagesCount >= 10 
                             ? 10
                             : data.pagesCount
                     )
+                    activatePagination()
                 }
-                activatePagination()
                 showMovies(data)
             })
         search.value = "";
