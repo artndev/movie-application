@@ -75,11 +75,22 @@ function showMovies(data) {
 // =================== PAGINATION ===================== //
 
 
-// Доделать поиск по ключевому слову
-let currentPage = "";
+
+let currentPage;
 let currentLink = API_URL_TOP;
 
-async function makeRequest(url, page = "1") {
+
+let availablePages;
+let totalPages = 5;
+let endSliced;
+let startSliced;
+
+
+const nextButton = document.querySelector('#next')
+const previousButton = document.querySelector('#previous')
+
+
+async function makeRequest(url, page = 1) {
     currentPage = page;
     currentLink = url;
 
@@ -93,6 +104,7 @@ async function makeRequest(url, page = "1") {
         })
         if(response.ok) {
             const data = await response.json()
+            availablePages = data.pagesCount
             console.log(typeof data, response, data)
             return data
         }
@@ -116,27 +128,52 @@ function clearPagination() {
 }
 
 
-function displayPagination(amount) {
-    for(let i = 1; i <= amount; i++) {
-        const el = document.createElement("li")
-        el.innerText =`${String(i)}`
-        paginationList.appendChild(el)
 
+
+function displayPagination() {
+    for(let i = startSliced; i <= endSliced; i++) {
+        const el = document.createElement("li")
         el.classList.add("pagination__item")
-        if(i === 1) {
+        if(i === currentPage) {
             el.classList.add("pagination__item--active")
         }
+        el.innerText =`${String(i)}`
+
+        paginationList.appendChild(el)
     }
 }
+
+nextButton.addEventListener("click", () => {
+    endSliced += 1
+    startSliced = endSliced - totalPages - 1
+    paginationList.innerHTML = ""
+
+    displayPagination()
+    activatePagination()
+})
+
+previousButton.addEventListener("click", () => {
+    if(startSliced !== 1) {
+        endSliced -= 1
+        startSliced = endSliced - totalPages - 1
+        paginationList.innerHTML = ""
+    
+        displayPagination()
+        activatePagination()
+    }
+})
+
+
+
 
 async function activatePagination() {
     let _children = Array.from(paginationList.children)
 
     _children.forEach(el => {
         el.addEventListener("click", e => {
-            if(e.target.innerText !== currentPage) {
+            if(parseInt(e.target.innerText) !== currentPage) {
                 clearPagination()
-                makeRequest(currentLink, e.target.innerText)
+                makeRequest(currentLink, parseInt(e.target.innerText))
                     .then(data => {
                         showMovies(data)
                     })
@@ -159,15 +196,13 @@ async function activatePagination() {
 makeRequest(API_URL_TOP)
     .then(data => {
         paginationList.innerHTML = ""
+        endSliced = Math.floor(availablePages / totalPages)
+        startSliced = 1
         return data
     })
     .then(data => {
         if(data.pagesCount > 1) {
-            displayPagination(
-                data.pagesCount >= 10 
-                    ? 10
-                    : data.pagesCount
-            )
+            displayPagination(30)
         }
         activatePagination()
         showMovies(data)

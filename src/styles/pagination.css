@@ -19,6 +19,35 @@
     user-select: none;
 }
   
+.pagination__button {
+  display: inline-block;
+  background-color: transparent;  
+
+  width: 2.5rem;
+  height: 2.5rem;
+
+  border-radius: 0.5vh;
+  border: 1px solid white;
+
+  text-align: center;
+  font-weight: bold;
+  color: white;
+
+  padding: .45rem;
+  margin: .5rem;
+
+  cursor: pointer;
+  transition: transform .15s ease-in-out;
+}
+
+.pagination__button:hover {
+  color: gold;
+}
+
+.pagination__button:active {
+  transform: scale(.95);
+}
+
 .pagination__item {
     display: inline-block;
     
@@ -40,7 +69,7 @@
 }
 
 .pagination__item:hover {
-  transform: scale(.95);
+  color: gold;
 }
 
 .pagination__item--active {
