@@ -22,8 +22,9 @@
 .pagination__button {
   display: inline-block;
   background-color: transparent;  
+  text-align: center;
 
-  width: 2.5rem;
+  width: 2rem;
   height: 2.5rem;
 
   border-radius: 0.5vh;

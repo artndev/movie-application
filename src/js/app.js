@@ -80,12 +80,6 @@ let currentPage;
 let currentLink = API_URL_TOP;
 
 
-let availablePages;
-let totalPages = 5;
-let endSliced;
-let startSliced;
-
-
 const nextButton = document.querySelector('#next')
 const previousButton = document.querySelector('#previous')
 
@@ -130,65 +124,82 @@ function clearPagination() {
 
 
 
-function displayPagination() {
-    for(let i = startSliced; i <= endSliced; i++) {
-        const el = document.createElement("li")
-        el.classList.add("pagination__item")
-        if(i === currentPage) {
-            el.classList.add("pagination__item--active")
-        }
-        el.innerText =`${String(i)}`
+function displayPagination(start, end) {
+    return new Promise(resolve => {
+        for(let i = start; i <= end; i++) {
+            // ======== Добавление элемента ==========
+            const el = document.createElement("li")
+    
+            el.classList.add("pagination__item")
+            if(i === 1) {
+                el.classList.add("pagination__item--active")
+            }
 
-        paginationList.appendChild(el)
-    }
+            el.innerText =`${i.toString()}`
+            paginationList.appendChild(el)
+            resolve()
+        }
+    })
 }
 
-nextButton.addEventListener("click", () => {
-    endSliced += 1
-    startSliced = endSliced - totalPages - 1
-    paginationList.innerHTML = ""
-
-    displayPagination()
-    activatePagination()
-})
-
-previousButton.addEventListener("click", () => {
-    if(startSliced !== 1) {
-        endSliced -= 1
-        startSliced = endSliced - totalPages - 1
-        paginationList.innerHTML = ""
-    
-        displayPagination()
-        activatePagination()
-    }
-})
-
+function activateButtons(start = 1, end = 2, total) {
+    return new Promise(resolve => {
+        displayPagination(start, end)
+            .then(() => {
+                nextButton.addEventListener("click", () => {
+                    if(end !== total) {
+                        end += 1
+                        start += 1
+                        paginationList.innerHTML = ""
+                    
+                        displayPagination(start, end)
+                        activatePagination()
+                    }
+                })
+                
+                previousButton.addEventListener("click", () => {
+                    if(start !== 1) {
+                        end -= 1
+                        start -= 1
+                        paginationList.innerHTML = ""
+                    
+                        displayPagination(start, end)
+                        activatePagination()
+                    }
+                }) 
+                resolve()
+            })
+    })
+}
 
 
 
 async function activatePagination() {
-    let _children = Array.from(paginationList.children)
+    return new Promise(resolve => {
+        let _children = Array.from(paginationList.children)
 
-    _children.forEach(el => {
-        el.addEventListener("click", e => {
-            if(parseInt(e.target.innerText) !== currentPage) {
-                clearPagination()
-                makeRequest(currentLink, parseInt(e.target.innerText))
-                    .then(data => {
-                        showMovies(data)
-                    })
-                    .then(() => {
-                        e.target.classList.add(
-                            "pagination__item--active"
-                        )
-                    })
-                    .finally(() => {
-                        window.scrollTo({
-                            top: 0,
-                            behavior: 'smooth'
+        _children.forEach(el => {
+            el.addEventListener("click", e => {
+                if(parseInt(e.target.innerText) !== currentPage) {
+                    clearPagination()
+                    makeRequest(currentLink, parseInt(e.target.innerText))
+                        .then(data => {
+                            showMovies(data)
                         })
-                    })   
-            }
+                        .then(() => {
+                            e.target.classList.add(
+                                "pagination__item--active"
+                            )
+                        })
+                        .finally(() => {
+                            window.scrollTo({
+                                top: 0,
+                                behavior: 'smooth'
+                            })
+                            resolve()
+                        })   
+                }
+            })
         })
     })
 }
@@ -196,16 +207,11 @@ async function activatePagination() {
 makeRequest(API_URL_TOP)
     .then(data => {
         paginationList.innerHTML = ""
-        endSliced = Math.floor(availablePages / totalPages)
-        startSliced = 1
         return data
     })
     .then(data => {
-        if(data.pagesCount > 1) {
-            displayPagination(30)
-        }
-        activatePagination()
         showMovies(data)
+        activateButtons(1, 10, 30).then(() => activatePagination())
     })
 
 
@@ -222,15 +228,8 @@ form.addEventListener('submit', e => {
                 return data
             })
             .then(data => {
-                if(data.pagesCount > 1) {
-                    displayPagination(
-                        data.pagesCount >= 10 
-                            ? 10
-                            : data.pagesCount
-                    )
-                    activatePagination()
-                }
                 showMovies(data)
+                activateButtons(1, 10, 30).then(() => activatePagination())
             })
         search.value = "";
     }
