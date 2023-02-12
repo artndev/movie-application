@@ -75,11 +75,16 @@ function showMovies(data) {
 // =================== PAGINATION ===================== //
 
 
-// Доделать поиск по ключевому слову
-let currentPage = "";
+
+let currentPage;
 let currentLink = API_URL_TOP;
 
-async function makeRequest(url, page = "1") {
+
+const nextButton = document.querySelector('#next')
+const previousButton = document.querySelector('#previous')
+
+
+async function makeRequest(url, page = 1) {
     currentPage = page;
     currentLink = url;
 
@@ -93,7 +98,8 @@ async function makeRequest(url, page = "1") {
         })
         if(response.ok) {
             const data = await response.json()
-            console.log(typeof data)
+            availablePages = data.pagesCount
+            console.log(typeof data, response, data)
             return data
         }
     }
@@ -116,59 +122,96 @@ function clearPagination() {
 }
 
 
-function displayPagination(amount) {
-    console.log(amount)
-    paginationList.innerHTML = ""
-    for(let i = 1; i <= amount; i++) {
-        const el = document.createElement("li")
-        el.innerText =`${String(i)}`
-        paginationList.appendChild(el)
 
-        el.classList.add("pagination__item")
-        if(i === 1) {
-            el.classList.add("pagination__item--active")
+
+function displayPagination(start, end) {
+    return new Promise(resolve => {
+        for(let i = start; i <= end; i++) {
+            // ======== Добавление элемента ==========
+            const el = document.createElement("li")
+    
+            el.classList.add("pagination__item")
+            if(i === 1) {
+                el.classList.add("pagination__item--active")
+            }
+
+            el.innerText =`${i.toString()}`
+            paginationList.appendChild(el)
+            resolve()
         }
-    }
+    })
 }
 
-async function activatePagination() {
-    let _children = Array.from(paginationList.children)
+function activateButtons(start = 1, end = 2, total) {
+    return new Promise(resolve => {
+        displayPagination(start, end)
+            .then(() => {
+                nextButton.addEventListener("click", () => {
+                    if(end !== total) {
+                        end += 1
+                        start += 1
+                        paginationList.innerHTML = ""
+                    
+                        displayPagination(start, end)
+                        activatePagination()
+                    }
+                })
+                
+                previousButton.addEventListener("click", () => {
+                    if(start !== 1) {
+                        end -= 1
+                        start -= 1
+                        paginationList.innerHTML = ""
+                    
+                        displayPagination(start, end)
+                        activatePagination()
+                    }
+                }) 
+                resolve()
+            })
+    })
+}
 
-    _children.forEach(el => {
-        el.addEventListener("click", e => {
-            if(e.target.innerText !== currentPage) {
-                clearPagination()
-                makeRequest(currentLink, e.target.innerText)
-                    .then(data => {
-                        showMovies(data)
-                    })
-                    .then(() => {
-                        e.target.classList.add(
-                            "pagination__item--active"
-                        )
-                    })
-                    .finally(() => {
-                        window.scrollTo({
-                            top: 0,
-                            behavior: 'smooth'
+
+
+async function activatePagination() {
+    return new Promise(resolve => {
+        let _children = Array.from(paginationList.children)
+
+        _children.forEach(el => {
+            el.addEventListener("click", e => {
+                if(parseInt(e.target.innerText) !== currentPage) {
+                    clearPagination()
+                    makeRequest(currentLink, parseInt(e.target.innerText))
+                        .then(data => {
+                            showMovies(data)
                         })
-                    })   
-            }
+                        .then(() => {
+                            e.target.classList.add(
+                                "pagination__item--active"
+                            )
+                        })
+                        .finally(() => {
+                            window.scrollTo({
+                                top: 0,
+                                behavior: 'smooth'
+                            })
+                            resolve()
+                        })   
+                }
+            })
         })
     })
 }
 
 makeRequest(API_URL_TOP)
     .then(data => {
-        if(data.pagesCount > 1) {
-            displayPagination(
-                data.pagesCount >= 10 
-                    ? 10
-                    : data.pagesCount
-            )
-        }
-        activatePagination()
+        paginationList.innerHTML = ""
+        return data
+    })
+    .then(data => {
         showMovies(data)
+        activateButtons(1, 10, 30).then(() => activatePagination())
     })
 
 
@@ -181,15 +224,12 @@ form.addEventListener('submit', e => {
     if(search.value) {
         makeRequest(API_URL_SEARCH + search.value)
             .then(data => {
-                if(data.pagesCount > 1) {
-                    displayPagination(
-                        data.pagesCount >= 10 
-                            ? 10
-                            : data.pagesCount
-                    )
-                }
-                activatePagination()
+                paginationList.innerHTML = ""
+                return data
+            })
+            .then(data => {
                 showMovies(data)
+                activateButtons(1, 10, 30).then(() => activatePagination())
             })
         search.value = "";
     }

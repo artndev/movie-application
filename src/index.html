@@ -4,9 +4,11 @@
     <meta charset="UTF-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
     <link rel="stylesheet" href="./styles/style.css">
     <link rel="stylesheet" href="./styles/modal.css">
     <link rel="stylesheet" href="./styles/pagination.css">
+
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.3.0/css/all.min.css">
 
     <title>Movie App</title>
@@ -34,6 +36,12 @@
         </div>
         <div class="pagination__wrapper">
             <div class="pagination">
+                <button class="pagination__button" id="previous">
+                    <i 
+                        class="fa-solid fa-arrow-right" 
+                        style="transform: rotate(-180deg);">
+                    </i>
+                </button>
                 <ul class="pagination__list">
                     <!-- <li class="pagination__item pagination__item--active">1</li>
                     <li class="pagination__item">2</li>
@@ -53,11 +61,14 @@
                     <li class="pagination__item">14</li>
                     <li class="pagination__item">15</li> -->
                 </ul>
+                <button class="pagination__button" id="next">
+                    <i class="fa-solid fa-arrow-right"></i>
+                </button>
             </div>
         </div>
     </div>
 
-    <script src="app.js"></script>
+    <script src="./js/app.js"></script>
     <!-- <script src="./test.js"></script> -->
 </body>
 </html>
