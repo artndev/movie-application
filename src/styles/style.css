@@ -1,11 +1,14 @@
-@import url('https://fonts.googleapis.com/css2?family=Poppins&display=swap');
+@font-face {
+    font-family: "Golos Text";
+    src: url("../fonts/Golos.woff");
+}
 
 * {
     margin: 0;
     padding: 0;
     box-sizing: border-box;
     -webkit-tap-highlight-color: transparent;
-    font-family: 'Poppins', sans-serif;
+    font-family: "Golos Text", sans-serif;
 }
 
 body { 
