@@ -77,7 +77,6 @@ function showMovies(data) {
 
 
 let currentPage;
-let currentLink = API_URL_TOP;
 
 
 const nextButton = document.querySelector('#next')
@@ -86,8 +85,8 @@ const previousButton = document.querySelector('#previous')
 
 async function makeRequest(url, page = 1) {
     currentPage = page;
-    currentLink = url;
 
+    console.log(currentPage)
     try {
         const response = await fetch(url + `&page=${page}`, {
             method: 'GET',
@@ -96,12 +95,10 @@ async function makeRequest(url, page = 1) {
                 'Content-Type': 'application/json',
             }
         })
-        if(response.ok) {
-            const data = await response.json()
-            availablePages = data.pagesCount
-            console.log(typeof data, response, data)
-            return data
-        }
+        const data = await response.json()
+        availablePages = data.pagesCount
+        console.log(typeof data, response, data)
+        return data
     }
     catch {
         throw new Error("Something is going wrong!")
@@ -124,114 +121,172 @@ function clearPagination() {
 
 
 
-function displayPagination(start, end) {
-    return new Promise(resolve => {
-        for(let i = start; i <= end; i++) {
-            // ======== Добавление элемента ==========
-            const el = document.createElement("li")
-    
-            el.classList.add("pagination__item")
-            if(i === 1) {
-                el.classList.add("pagination__item--active")
-            }
 
-            el.innerText =`${i.toString()}`
-            paginationList.appendChild(el)
-            resolve()
-        }
-    })
-}
+// function activateButtons(start = 1, end = 2, total) {
+//     displayPagination(start, end)
+//     activatePagination()
 
-function activateButtons(start = 1, end = 2, total) {
-    return new Promise(resolve => {
-        displayPagination(start, end)
-            .then(() => {
-                nextButton.addEventListener("click", () => {
-                    if(end !== total) {
-                        end += 1
-                        start += 1
-                        paginationList.innerHTML = ""
+
+//             nextButton.addEventListener("click", e => {
+//                 console.log(start, end, total)
+//                 if((end !== total) || (start !== total) || (currentPage !== total)) {
                     
-                        displayPagination(start, end)
-                        activatePagination()
-                    }
-                })
+//                     end += 1
+//                     start += 1
+//                     paginationList.innerHTML = ""
                 
-                previousButton.addEventListener("click", () => {
-                    if(start !== 1) {
-                        end -= 1
-                        start -= 1
-                        paginationList.innerHTML = ""
-                    
-                        displayPagination(start, end)
-                        activatePagination()
-                    }
-                }) 
-                resolve()
-            })
-    })
+//                     displayPagination(start, end)
+//                     activatePagination()
+//                 }
+//             })
+            
+//             previousButton.addEventListener("click", () => {
+//                 if(start !== 1) {
+//                     end -= 1
+//                     start -= 1
+//                     paginationList.innerHTML = ""
+                
+//                     displayPagination(start, end)
+//                     activatePagination()
+//                 }
+//             }) 
+// }
+
+function displayPagination(start, end) {
+    paginationList.innerHTML = ""
+    for(let i = start; i <= end; i++) {
+        const el = document.createElement("li");
+        if(i === currentPage) {
+            el.classList.add(
+                "pagination__item", 
+                "pagination__item--active"
+            )
+        }
+        else {
+            el.classList.add("pagination__item")
+        }
+        el.innerText = `${String(i)}`
+        paginationList.appendChild(el)
+    } 
+    return Array.from(paginationList.children)
 }
 
+function activatePagination(url, start, end) {
+    let _children = displayPagination(start, end)
 
+    _children.forEach(el => {
+        el.addEventListener("click", e => {
+            const num = parseInt(e.target.innerText)
+            console.log(num)
 
-async function activatePagination() {
-    return new Promise(resolve => {
-        let _children = Array.from(paginationList.children)
-
-        _children.forEach(el => {
-            el.addEventListener("click", e => {
-                if(parseInt(e.target.innerText) !== currentPage) {
-                    clearPagination()
-                    makeRequest(currentLink, parseInt(e.target.innerText))
-                        .then(data => {
-                            showMovies(data)
+            if(num !== currentPage) {
+                clearPagination()
+                makeRequest(url, num)
+                    .then(data => {
+                        // start = num
+                        // end = start + perPage - 1
+                        showMovies(data)
+                    })
+                    .then(() => {
+                        e.target.classList.add(
+                            "pagination__item--active"
+                        )
+                    })
+                    .finally(() => {
+                        window.scrollTo({
+                            top: 0,
+                            behavior: 'smooth'
                         })
-                        .then(() => {
-                            e.target.classList.add(
-                                "pagination__item--active"
-                            )
-                        })
-                        .finally(() => {
-                            window.scrollTo({
-                                top: 0,
-                                behavior: 'smooth'
-                            })
-                            resolve()
-                        })   
-                }
-            })
+                    })   
+            }
         })
-    })
+    }) 
 }
 
-makeRequest(API_URL_TOP)
-    .then(data => {
-        paginationList.innerHTML = ""
-        return data
-    })
-    .then(data => {
-        showMovies(data)
-        activateButtons(1, 10, 30).then(() => activatePagination())
-    })
+
+
+function initializePagination(url, amount, perPage) {
+        let start = 1
+        let end = start + perPage - 1
+        activatePagination(url, start, end)
+
+        console.log(start, end)
+
+        // nextButton.removeEventListener("click", nextButtonClick)
+        // previousButton.removeEventListener("click", previousButtonClick)
+
+        nextButton.addEventListener("click", e => {
+            console.log(start, end)
+            if(
+                (e.target.tagName.toLowerCase() === "button")
+                &&
+                (end !== amount)
+            ) {
+                console.log(e)
+                start += perPage
+                end += perPage
+        
+                activatePagination(url, start, end)
+                return
+            }
+        })
+
+        previousButton.addEventListener("click", e => {
+            console.log(start, end)
+            if(
+                (e.target.tagName.toLowerCase() === "button") 
+                && 
+                (start !== 1)
+            ) {
+                start -= perPage
+                end -= perPage
+        
+                activatePagination(url, start, end)
+                return
+            }  
+        })
+}
+
+// TODO: ВЫНЕСТИ ЭТУ ЗАПИСЬ В ОТДЕЛЬНЫЙ ФАЙЛ - СДЕЛАТЬ ЗАПУСК ЕДИНОЖДЫМ
+// !!! ЗАПУСКАЕТСЯ ПОСТОЯННО, ПРИ КАЖДОМ ОБНОВЛЕНИИ СТРАНИЦЫ
+// !!! И ДАЖЕ ПРИ ПОИСКЕ, ПОЭТОМУ В ОУТПУТЕ ДУБЛИРУЮТСЯ ЗАПИСИ
+// makeRequest(API_URL_TOP + search.value)
+// .then(data => {
+//     showMovies(data)
+//     return data
+// }).then(data => {
+//     // console.log(data.pagesCount)
+//     const pages = data.pagesCount > 20 ? 20 : data.pagesCount
+//     paginationList.innerHTML = ""
+
+//     initializePagination(
+//         API_URL_TOP + search.value, 
+//         20, 
+//         5
+//     )
+// })
 
 
 
-
-
-form.addEventListener('submit', e => {
+form.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     if(search.value) {
         makeRequest(API_URL_SEARCH + search.value)
             .then(data => {
-                paginationList.innerHTML = ""
-                return data
-            })
-            .then(data => {
                 showMovies(data)
-                activateButtons(1, 10, 30).then(() => activatePagination())
+                return data
+            }).then(data => {
+                // console.log(data.pagesCount)
+                const pages = data.pagesCount > 20 ? 20 : data.pagesCount
+                paginationList.innerHTML = ""
+
+                initializePagination(
+                    API_URL_SEARCH + search.value, 
+                    pages, 
+                    1
+                )
             })
-        search.value = "";
     }
 });
 
