@@ -78,7 +78,6 @@ function showMovies(data) {
 
 let currentPage;
 
-
 const nextButton = document.querySelector('#next')
 const previousButton = document.querySelector('#previous')
 
@@ -122,36 +121,6 @@ function clearPagination() {
 
 
 
-// function activateButtons(start = 1, end = 2, total) {
-//     displayPagination(start, end)
-//     activatePagination()
-
-
-//             nextButton.addEventListener("click", e => {
-//                 console.log(start, end, total)
-//                 if((end !== total) || (start !== total) || (currentPage !== total)) {
-                    
-//                     end += 1
-//                     start += 1
-//                     paginationList.innerHTML = ""
-                
-//                     displayPagination(start, end)
-//                     activatePagination()
-//                 }
-//             })
-            
-//             previousButton.addEventListener("click", () => {
-//                 if(start !== 1) {
-//                     end -= 1
-//                     start -= 1
-//                     paginationList.innerHTML = ""
-                
-//                     displayPagination(start, end)
-//                     activatePagination()
-//                 }
-//             }) 
-// }
-
 function displayPagination(start, end) {
     paginationList.innerHTML = ""
     for(let i = start; i <= end; i++) {
@@ -182,11 +151,7 @@ function activatePagination(url, start, end) {
             if(num !== currentPage) {
                 clearPagination()
                 makeRequest(url, num)
-                    .then(data => {
-                        // start = num
-                        // end = start + perPage - 1
-                        showMovies(data)
-                    })
+                    .then(data => { showMovies(data) })
                     .then(() => {
                         e.target.classList.add(
                             "pagination__item--active"
@@ -205,6 +170,8 @@ function activatePagination(url, start, end) {
 
 
 
+let x, y;
+
 function initializePagination(url, amount, perPage) {
         let start = 1
         let end = start + perPage - 1
@@ -212,11 +179,10 @@ function initializePagination(url, amount, perPage) {
 
         console.log(start, end)
 
-        // nextButton.removeEventListener("click", nextButtonClick)
-        // previousButton.removeEventListener("click", previousButtonClick)
-
-        nextButton.addEventListener("click", e => {
-            console.log(start, end)
+        nextButton.removeAllEventListeners()
+        previousButton.removeAllEventListeners()
+        
+        function nextButtonClick (e) {
             if(
                 (e.target.tagName.toLowerCase() === "button")
                 &&
@@ -227,25 +193,35 @@ function initializePagination(url, amount, perPage) {
                 end += perPage
         
                 activatePagination(url, start, end)
-                return
-            }
-        })
+            }         
+        }
 
-        previousButton.addEventListener("click", e => {
-            console.log(start, end)
+        function previousButtonClick (e) {
             if(
                 (e.target.tagName.toLowerCase() === "button") 
                 && 
-                (start !== 1)
+                (start > 1)
             ) {
                 start -= perPage
                 end -= perPage
-        
                 activatePagination(url, start, end)
-                return
-            }  
+            } 
+        }
+        
+        nextButton.addEventListenerNew("click", (e) => {
+            console.log(start, end)
+            nextButtonClick(e)
+        })
+        
+
+        previousButton.addEventListenerNew("click", (e) => {
+            console.log(start, end)
+            previousButtonClick(e)
         })
 }
+
+
+
 
 // TODO: ВЫНЕСТИ ЭТУ ЗАПИСЬ В ОТДЕЛЬНЫЙ ФАЙЛ - СДЕЛАТЬ ЗАПУСК ЕДИНОЖДЫМ
 // !!! ЗАПУСКАЕТСЯ ПОСТОЯННО, ПРИ КАЖДОМ ОБНОВЛЕНИИ СТРАНИЦЫ
@@ -268,7 +244,7 @@ function initializePagination(url, amount, perPage) {
 
 
 
-form.addEventListener('submit', async (e) => {
+form.addEventListener('submit', e => {
     e.preventDefault();
 
     if(search.value) {
@@ -279,9 +255,9 @@ form.addEventListener('submit', async (e) => {
             }).then(data => {
                 // console.log(data.pagesCount)
                 const pages = data.pagesCount > 20 ? 20 : data.pagesCount
-                paginationList.innerHTML = ""
 
-                initializePagination(
+                initializePagination.call(
+                    pages, 
                     API_URL_SEARCH + search.value, 
                     pages, 
                     1
