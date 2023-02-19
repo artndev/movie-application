@@ -170,53 +170,39 @@ function activatePagination(url, start, end) {
 
 
 
-let x, y;
-
 function initializePagination(url, amount, perPage) {
         let start = 1
         let end = start + perPage - 1
         activatePagination(url, start, end)
-
         console.log(start, end)
+
 
         nextButton.removeAllEventListeners()
         previousButton.removeAllEventListeners()
-        
-        function nextButtonClick (e) {
-            if(
-                (e.target.tagName.toLowerCase() === "button")
-                &&
-                (end !== amount)
-            ) {
-                console.log(e)
+
+        nextButton.addEventListenerNew("click", () => {
+            console.group("->")
+            console.log(start, end)
+            console.groupEnd()
+            if(end !== amount) {
                 start += perPage
                 end += perPage
         
                 activatePagination(url, start, end)
-            }         
-        }
-
-        function previousButtonClick (e) {
-            if(
-                (e.target.tagName.toLowerCase() === "button") 
-                && 
-                (start > 1)
-            ) {
-                start -= perPage
-                end -= perPage
-                activatePagination(url, start, end)
-            } 
-        }
-        
-        nextButton.addEventListenerNew("click", (e) => {
-            console.log(start, end)
-            nextButtonClick(e)
+            }  
         })
         
 
-        previousButton.addEventListenerNew("click", (e) => {
+        previousButton.addEventListenerNew("click", () => {
+            console.group("<-")
             console.log(start, end)
-            previousButtonClick(e)
+            console.groupEnd()
+            if(start > 1) {
+                start -= perPage
+                end -= perPage
+
+                activatePagination(url, start, end)
+            } 
         })
 }
 
@@ -226,22 +212,19 @@ function initializePagination(url, amount, perPage) {
 // TODO: ВЫНЕСТИ ЭТУ ЗАПИСЬ В ОТДЕЛЬНЫЙ ФАЙЛ - СДЕЛАТЬ ЗАПУСК ЕДИНОЖДЫМ
 // !!! ЗАПУСКАЕТСЯ ПОСТОЯННО, ПРИ КАЖДОМ ОБНОВЛЕНИИ СТРАНИЦЫ
 // !!! И ДАЖЕ ПРИ ПОИСКЕ, ПОЭТОМУ В ОУТПУТЕ ДУБЛИРУЮТСЯ ЗАПИСИ
-// makeRequest(API_URL_TOP + search.value)
-// .then(data => {
-//     showMovies(data)
-//     return data
-// }).then(data => {
-//     // console.log(data.pagesCount)
-//     const pages = data.pagesCount > 20 ? 20 : data.pagesCount
-//     paginationList.innerHTML = ""
+makeRequest(API_URL_TOP)
+    .then(data => {
+        showMovies(data)
+        return data
+    }).then(data => {
+        const pages = data.pagesCount > 20 ? 20 : data.pagesCount
 
-//     initializePagination(
-//         API_URL_TOP + search.value, 
-//         20, 
-//         5
-//     )
-// })
-
+        initializePagination(
+            API_URL_TOP, 
+            pages, 
+            1
+        )
+    })
 
 
 form.addEventListener('submit', e => {
@@ -253,11 +236,9 @@ form.addEventListener('submit', e => {
                 showMovies(data)
                 return data
             }).then(data => {
-                // console.log(data.pagesCount)
                 const pages = data.pagesCount > 20 ? 20 : data.pagesCount
 
-                initializePagination.call(
-                    pages, 
+                initializePagination(
                     API_URL_SEARCH + search.value, 
                     pages, 
                     1
