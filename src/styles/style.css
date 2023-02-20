@@ -58,9 +58,7 @@ body {
     flex-wrap: wrap;
     justify-content: space-evenly;
     padding: 1.5rem;
-    margin-top: 2rem;
     border-top: 2px solid rgba(116, 112, 112, 0.644);
-    border-bottom: 2px solid rgba(116, 112, 112, 0.644);
 }
 
 .movie {
