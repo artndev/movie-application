@@ -145,7 +145,6 @@ body {
 
 .no__results {
     color: #ffffff;
-    /* background-color: red; */
     display: flex;
     align-items: center;
     justify-content: center;
@@ -154,9 +153,12 @@ body {
     font-size: 1.5rem;
     height: 10rem;
     margin: 2rem;
-    border-bottom: 2px solid rgba(116, 112, 112, 0.644);
 }
 
 .emoji {
     font-size: 3rem;
+}
+
+.hide {
+    display: none;
 }
