@@ -11,6 +11,7 @@ const search = document.querySelector('.header__search');
 
 const modalElement = document.querySelector('.modal');
 const paginationList = document.querySelector('.pagination__list')
+const paginationWrapper = document.querySelector('.pagination__wrapper')
 
 function getClassByRate(vote) {
     if(vote >= 7) {
@@ -80,7 +81,7 @@ let currentPage;
 
 const nextButton = document.querySelector('#next')
 const previousButton = document.querySelector('#previous')
-
+const noResults = document.querySelector('.no__results')
 
 async function makeRequest(url, page = 1) {
     currentPage = page;
@@ -237,11 +238,19 @@ form.addEventListener('submit', e => {
             }).then(data => {
                 const pages = data.pagesCount > 20 ? 20 : data.pagesCount
 
-                initializePagination(
-                    API_URL_SEARCH + search.value, 
-                    pages, 
-                    1
-                )
+                if(pages > 0) {
+                    initializePagination(
+                        API_URL_SEARCH + search.value, 
+                        pages, 
+                        1
+                    )
+                    paginationWrapper.style.display = "flex"
+                    noResults.style.display = "none"
+                }
+                else {
+                    paginationWrapper.style.display = "none"
+                    noResults.style.display = "flex"
+                }
             })
     }
 });
