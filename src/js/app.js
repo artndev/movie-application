@@ -49,16 +49,48 @@ function openModal(id) {
                 <img class="modal__movie-backdrop" src="${data.posterUrl}" alt="">
                 <h2>
                   <span class="modal__movie-title">${data.nameRu}</span>
-                  <span class="modal__movie-release-year"> - ${data.year}</span>
+                  <span class="modal__movie-release-year"> - ${data.year}г.</span>
                 </h2>
                 <ul class="modal__movie-info">
                   <div class="loader"></div>
-                  <li class="modal__movie-genre">Жанр - ${data.genres.map((el) => ` <span>${el.genre}</span>`)}</li>
-                  ${data.filmLength ? `<li class="modal__movie-runtime">Время - ${data.filmLength} минут</li>` : ''}
-                  <li >Сайт - <a class="modal__movie-site" href="${data.webUrl}">${data.webUrl}</a></li>
+                  <li class="modal__movie-genre">
+                     Жанр(ы): ${data.genres.map((el) => ` <span>${el.genre}</span>`)}
+                  </li>
+                    ${
+                        data.filmLength 
+                        ? 
+                        `
+                        <li class="modal__movie-runtime">
+                            Время: ${data.filmLength} мин.
+                        </li>` 
+                        : 
+                        ''
+                    }
+                  <li>
+                    Сайт:
+                    <p>
+                        <a class="modal__movie-site" href="${data.webUrl}">
+                            ${data.webUrl}
+                        </a>
+                    </p>
+                  </li>
                   <li class="modal__movie-overview">
                     Описание:
-                    <p>${data.description}</p>
+                    <p>
+                    ${
+                        data.description.length > 150 
+                        ?
+                        data.description.slice(0, 150).trim() + 
+                         `<a 
+                            class="modal__movie-site" 
+                            style="text-decoration: none;" 
+                            href="${data.webUrl}">
+                            ...
+                          </a>`
+                        :
+                        data.description.trim()
+                    }
+                    </p>
                   </li>
                 </ul>
                 <button type="button" class="modal__button-close">Закрыть</button>
@@ -68,8 +100,6 @@ function openModal(id) {
             btnClose.addEventListener("click", () => closeModal());
         })
   }
-
-
 
 
 // =================== MAIN ===================== //
