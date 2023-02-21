@@ -93,7 +93,9 @@ function openModal(id) {
                     </p>
                   </li>
                 </ul>
-                <button type="button" class="modal__button-close">Закрыть</button>
+                <button type="button" class="modal__button-close">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
               </div>
             `
             const btnClose = document.querySelector(".modal__button-close");
