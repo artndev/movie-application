@@ -85,9 +85,10 @@ const previousButton = document.querySelector('#previous')
 async function makeRequest(url, page = 1) {
     currentPage = page;
 
-    console.log(currentPage)
+    console.log(`Current page -> ${currentPage}`)
     try {
-        const response = await fetch(url + `&page=${page}`, {
+        const response = 
+        await fetch(url.replace(" ", "%20") + `&page=${page}`, {
             method: 'GET',
             headers: {
                 'X-API-KEY': API_KEY,
@@ -95,13 +96,14 @@ async function makeRequest(url, page = 1) {
             }
         })
         const data = await response.json()
-        availablePages = data.pagesCount
-        console.log(typeof data, response, data)
+        console.group(`Answer on ${url}` + `&page=${page}`)
+        console.log(response, data)
+        console.groupEnd()
         return data
     }
     catch {
-        throw new Error("Something is going wrong!")
-    }
+        throw new Error("A trouble was appeared with the response!")
+    }     
 }
 
 
@@ -131,9 +133,8 @@ function displayPagination(start, end) {
                 "pagination__item--active"
             )
         }
-        else {
+        else 
             el.classList.add("pagination__item")
-        }
         el.innerText = `${String(i)}`
         paginationList.appendChild(el)
     } 
@@ -146,7 +147,6 @@ function activatePagination(url, start, end) {
     _children.forEach(el => {
         el.addEventListener("click", e => {
             const num = parseInt(e.target.innerText)
-            console.log(num)
 
             if(num !== currentPage) {
                 clearPagination()
@@ -174,14 +174,13 @@ function initializePagination(url, amount, perPage) {
         let start = 1
         let end = start + perPage - 1
         activatePagination(url, start, end)
-        console.log(start, end)
 
 
         nextButton.removeAllEventListeners()
         previousButton.removeAllEventListeners()
 
         nextButton.addEventListenerNew("click", () => {
-            console.group("->")
+            console.group("Next page ->")
             console.log(start, end)
             console.groupEnd()
             if(end !== amount) {
@@ -194,7 +193,7 @@ function initializePagination(url, amount, perPage) {
         
 
         previousButton.addEventListenerNew("click", () => {
-            console.group("<-")
+            console.group("<- Previous page")
             console.log(start, end)
             console.groupEnd()
             if(start > 1) {
@@ -209,9 +208,9 @@ function initializePagination(url, amount, perPage) {
 
 
 
-// TODO: ВЫНЕСТИ ЭТУ ЗАПИСЬ В ОТДЕЛЬНЫЙ ФАЙЛ - СДЕЛАТЬ ЗАПУСК ЕДИНОЖДЫМ
-// !!! ЗАПУСКАЕТСЯ ПОСТОЯННО, ПРИ КАЖДОМ ОБНОВЛЕНИИ СТРАНИЦЫ
-// !!! И ДАЖЕ ПРИ ПОИСКЕ, ПОЭТОМУ В ОУТПУТЕ ДУБЛИРУЮТСЯ ЗАПИСИ
+///// TODO: ВЫНЕСТИ ЭТУ ЗАПИСЬ В ОТДЕЛЬНЫЙ ФАЙЛ - СДЕЛАТЬ ЗАПУСК ЕДИНОЖДЫМ
+///// !!! ЗАПУСКАЕТСЯ ПОСТОЯННО, ПРИ КАЖДОМ ОБНОВЛЕНИИ СТРАНИЦЫ
+///// !!! И ДАЖЕ ПРИ ПОИСКЕ, ПОЭТОМУ В ОУТПУТЕ ДУБЛИРУЮТСЯ ЗАПИСИ
 makeRequest(API_URL_TOP)
     .then(data => {
         showMovies(data)
