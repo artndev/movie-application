@@ -10,8 +10,13 @@ const form = document.querySelector('form');
 const search = document.querySelector('.header__search');
 
 const modalElement = document.querySelector('.modal');
+const noResults = document.querySelector('.no__results')
+
 const paginationList = document.querySelector('.pagination__list')
 const paginationWrapper = document.querySelector('.pagination__wrapper')
+
+const nextButton = document.querySelector('#next')
+const previousButton = document.querySelector('#previous')
 
 function getClassByRate(vote) {
     if(vote >= 7) {
@@ -71,17 +76,22 @@ function showMovies(data) {
 }
 
 
-
-
 // =================== PAGINATION ===================== //
-
-
 
 let currentPage;
 
-const nextButton = document.querySelector('#next')
-const previousButton = document.querySelector('#previous')
-const noResults = document.querySelector('.no__results')
+
+function clearPagination() {
+    let _children = Array.from(paginationList.children)
+
+
+    _children.forEach(el => {
+        if(el.classList.contains("pagination__item--active")) {
+            el.classList.remove("pagination__item--active")
+        }
+    })
+}
+
 
 async function makeRequest(url, page = 1) {
     currentPage = page;
@@ -109,21 +119,6 @@ async function makeRequest(url, page = 1) {
 
 
 
-function clearPagination() {
-    let _children = Array.from(paginationList.children)
-
-
-    _children.forEach(el => {
-        if(el.classList.contains("pagination__item--active")) {
-            el.classList.remove("pagination__item--active")
-        }
-    })
-}
-
-
-
-
-
 function displayPagination(start, end) {
     paginationList.innerHTML = ""
     for(let i = start; i <= end; i++) {
@@ -141,6 +136,7 @@ function displayPagination(start, end) {
     } 
     return Array.from(paginationList.children)
 }
+
 
 function activatePagination(url, start, end) {
     let _children = displayPagination(start, end)
@@ -208,10 +204,6 @@ function initializePagination(url, amount, perPage) {
 
 
 
-
-///// TODO: ВЫНЕСТИ ЭТУ ЗАПИСЬ В ОТДЕЛЬНЫЙ ФАЙЛ - СДЕЛАТЬ ЗАПУСК ЕДИНОЖДЫМ
-///// !!! ЗАПУСКАЕТСЯ ПОСТОЯННО, ПРИ КАЖДОМ ОБНОВЛЕНИИ СТРАНИЦЫ
-///// !!! И ДАЖЕ ПРИ ПОИСКЕ, ПОЭТОМУ В ОУТПУТЕ ДУБЛИРУЮТСЯ ЗАПИСИ
 makeRequest(API_URL_TOP)
     .then(data => {
         showMovies(data)
@@ -251,153 +243,8 @@ form.addEventListener('submit', e => {
                     paginationWrapper.style.display = "none"
                     noResults.style.display = "flex"
                 }
+            }).finally(() => {
+                search.value = ""
             })
     }
 });
-
-
-// async function main() {
-//     // Modal window
-
-//     async function openModal(id) {
-//         getMovies(API_URL_DETAILS + id).then(responseData => {
-//             modalElement.classList.add("modal--show");
-//             document.body.classList.add("stop-scrolling");
-        
-//             modalElement.innerHTML = `
-//                 <div class="modal__card">
-//                     <img class="modal__movie-backdrop" src="${responseData.posterUrl}" alt="">
-//                     <h2>
-//                         <span class="modal__movie-title">${responseData.nameRu} - ${responseData.year}г</span> 
-//                     </h2>
-//                     <ul class="modal__movie-info">
-//                         <div class="loader"></div>
-//                         <li class="modal__movie-genre">
-//                             Жанр(ы):
-//                             <p>
-//                                 ${responseData.genres.map(genre => ` <span>${genre.genre}</span>`)}
-//                             </p>
-//                         </li>
-//                         ${
-//                             responseData.filmLength > 0
-//                             ?
-//                             `
-//                                 <li class="modal__movie-runtime">
-//                                     Время: ${responseData.filmLength} минут
-//                                 </li>
-//                             `
-//                             :
-//                             ""
-//                         }
-//                         <li>
-//                             Сайт: 
-//                             <a class="modal__movie-site" href="${responseData.webUrl}">
-//                                 ${responseData.webUrl}
-//                             </a>
-//                         </li>
-//                         <li class="modal__movie-overview">
-//                             Описание:
-//                             <p>
-//                                 ${responseData.description}
-//                             </p>
-//                         </li>
-//                     </ul>
-//                     <button type="button" class="modal__button-close">Закрыть</button>
-//                 </div>
-//             `;
-        
-//             const btnClose = document.querySelector(".modal__button-close");
-//             btnClose.addEventListener("click", () => closeModal());
-//         })
-//     }
-
-//     function closeModal() {
-//         modalElement.classList.remove("modal--show");
-//         document.body.classList.remove("stop-scrolling");
-//     }
-
-
-//     window.addEventListener("click", event => {
-//         if(event.target === modalElement) {
-//             closeModal();
-//         }
-//     });
-    
-//     window.addEventListener("keydown", event => {
-//         if(event.keyCode === 27) {
-//             closeModal();
-//         }
-//     });
-
-
-//     // Main section
-
-//     async function getMovies(url) {
-//         const response = await fetch(url, {
-//             method: 'GET',
-//             headers: {
-//                 'X-API-KEY': API_KEY,
-//                 'Content-Type': 'application/json',
-//             },
-//         });
-//         const responseData = await response.json();
-//         return responseData
-//     }
-
-//     // function showMovies(data) {
-//     //     const moviesElement = document.querySelector(".movies");
-//     //     moviesElement.innerHTML = "";    
-    
-//     //     data.films.forEach(movie => {
-//     //         const card = document.createElement("div");
-    
-//     //         card.classList.add("movie");
-//     //         card.innerHTML = `
-//     //             <div class="movie__cover-inner">
-//     //                 <img 
-//     //                     src="${movie.posterUrlPreview}" 
-//     //                     class="movie__cover" 
-//     //                     alt="${movie.nameRu}" 
-//     //                 />
-//     //                 <div class="movie__cover--darkened"></div>
-//     //             </div>
-//     //             <div class="movie__info">
-//     //                 <div class="movie__title">
-//     //                     ${movie.nameRu}
-//     //                 </div>
-//     //                 <div class="movie__category">
-//     //                     ${movie.genres.map(genre => ` ${genre.genre}`)}
-//     //                 </div>
-//     //                 ${
-//     //                     movie.rating > 0 
-//     //                     ? 
-//     //                     `
-//     //                     <div class="movie__average movie__average--${getClassByRate(movie.rating)}">
-//     //                         ${movie.rating}
-//     //                     </div>
-//     //                     `
-//     //                     :
-//     //                     ""
-//     //                 }
-//     //             </div>
-//     //         `;
-//     //         card.addEventListener("click", () => openModal(movie.filmId))
-//     //         moviesElement.appendChild(card);
-//     //     });
-//     // }
-
-
-
-//     getMovies(API_URL_TOP).then(data => showMovies(data));
-// }
-
-// main()
-
-
-
-
-
-
-// Modal 
-
-
