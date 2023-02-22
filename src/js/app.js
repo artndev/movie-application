@@ -17,6 +17,7 @@ const paginationWrapper = document.querySelector('.pagination__wrapper')
 
 const nextButton = document.querySelector('#next')
 const previousButton = document.querySelector('#previous')
+let currentPage;
 
 function getClassByRate(vote) {
     if(vote >= 7) {
@@ -31,6 +32,9 @@ function getClassByRate(vote) {
 }
 
 
+// =================== MODAL ===================== //
+
+
 function closeModal() {
     modalElement.classList.remove("modal--show");
     document.body.classList.remove("stop-scrolling");
@@ -40,7 +44,7 @@ function closeModal() {
 function openModal(id) {
     makeRequest(API_URL_DETAILS + id)
         .then(data => {
-            console.log(data)
+            console.log(`Movie with ID-${id} details =>`, data)
             modalElement.classList.add("modal--show");
             document.body.classList.add("stop-scrolling");
           
@@ -111,8 +115,12 @@ function openModal(id) {
                 </button>
               </div>
             `
-            const btnClose = document.querySelector(".modal__button-close");
-            btnClose.addEventListener("click", () => closeModal());
+            const closeButton = document.querySelector(".modal__button-close");
+            closeButton.addEventListener("click", () => {
+                setTimeout(() => {
+                    closeModal()
+                }, 150)
+            });
         })
   }
 
@@ -124,48 +132,48 @@ function showMovies(data) {
     const moviesElement = document.querySelector(".movies");
     moviesElement.innerHTML = "";    
 
-    data.films.forEach(movie => {
-        const card = document.createElement("div");
+    data.films
+        .filter(el => { return el.nameRu })
+        .forEach(movie => {
+            const card = document.createElement("div");
 
-        card.classList.add("movie");
-        card.innerHTML = `
-            <div class="movie__cover-inner">
-                <img 
-                    src="${movie.posterUrlPreview}" 
-                    class="movie__cover" 
-                    alt="${movie.nameRu}" 
-                />
-                <div class="movie__cover--darkened"></div>
-            </div>
-            <div class="movie__info">
-                <div class="movie__title">
-                    ${movie.nameRu}
+            card.classList.add("movie");
+            card.innerHTML = `
+                <div class="movie__cover-inner">
+                    <img 
+                        src="${movie.posterUrlPreview}" 
+                        class="movie__cover" 
+                        alt="${movie.nameRu}" 
+                    />
+                    <div class="movie__cover--darkened"></div>
                 </div>
-                <div class="movie__category">
-                    ${movie.genres.map(genre => ` ${genre.genre}`)}
-                </div>
-                ${
-                    movie.rating > 0 
-                    ? 
-                    `
-                    <div class="movie__average movie__average--${getClassByRate(movie.rating)}">
-                        ${movie.rating}
+                <div class="movie__info">
+                    <div class="movie__title">
+                        ${movie.nameRu}
                     </div>
-                    `
-                    :
-                    ""
-                }
-            </div>
-        `;
-        card.addEventListener("click", () => openModal(movie.filmId))
-        moviesElement.appendChild(card);
-    });
+                    <div class="movie__category">
+                        ${movie.genres.map(genre => ` ${genre.genre}`)}
+                    </div>
+                    ${
+                        movie.rating > 0 
+                        ? 
+                        `
+                        <div class="movie__average movie__average--${getClassByRate(movie.rating)}">
+                            ${movie.rating}
+                        </div>
+                        `
+                        :
+                        ""
+                    }
+                </div>
+            `;
+            card.addEventListener("click", () => openModal(movie.filmId))
+            moviesElement.appendChild(card);
+        });
 }
 
 
 // =================== PAGINATION ===================== //
-
-let currentPage;
 
 
 function clearPagination() {
@@ -183,7 +191,7 @@ function clearPagination() {
 async function makeRequest(url, page = 0) {
     currentPage = page;
 
-    console.log(`Current page -> ${currentPage}`)
+    console.log("Current page ->", currentPage)
     try {
         const response = 
         await fetch(
