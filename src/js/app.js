@@ -84,13 +84,13 @@ function openModal(id) {
                   ${
                         data.description
                         ?
-                            data.description.trim().length > 250
+                            data.description.trim().length > 210
                             ?
                             `
                             <li class="modal__movie-overview">
                                 <b>Краткое описание</b>:
                                 <p>
-                                    ${data.description.trim().slice(0, 249)}
+                                    ${data.description.trim().slice(0, 210)}
                                     <a 
                                         class="modal__movie-site" 
                                         style="text-decoration: none;"
