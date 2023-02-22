@@ -54,44 +54,57 @@ function openModal(id) {
                 <ul class="modal__movie-info">
                   <div class="loader"></div>
                   <li class="modal__movie-genre">
-                     Жанр(ы): ${data.genres.map((el) => ` <span>${el.genre}</span>`)}
+                     <b>Жанр(ы):</b> 
+                     <p>
+                        ${data.genres.map((el) => ` <span>${el.genre}</span>`)}
+                     </p>
                   </li>
                     ${
                         data.filmLength 
                         ? 
                         `
                         <li class="modal__movie-runtime">
-                            Время: ${data.filmLength} мин.
+                            <b>Время:</b> ${data.filmLength} мин.
                         </li>` 
                         : 
                         ''
                     }
                   <li>
-                    Сайт:
+                    <b>Сайт:</b>
                     <p>
                         <a class="modal__movie-site" href="${data.webUrl}">
                             ${data.webUrl}
                         </a>
                     </p>
                   </li>
-                  <li class="modal__movie-overview">
-                    Описание:
-                    <p>
-                    ${
-                        data.description.length > 150 
+                  ${
+                        data.description
                         ?
-                        data.description.slice(0, 150).trim() + 
-                         `<a 
-                            class="modal__movie-site" 
-                            style="text-decoration: none;" 
-                            href="${data.webUrl}">
-                            ...
-                          </a>`
+                            data.description.trim().length > 300
+                            ?
+                            `
+                            <li class="modal__movie-overview">
+                                <b>Описание</b>:
+                                <p>
+                                    ${data.description.trim().slice(0, 299)}
+                                    <a 
+                                        class="modal__movie-site" 
+                                        style="text-decoration: none;"
+                                        href="${data.webUrl}">
+                                    ...</a>
+                                </p>
+                            </li>`
+                            :
+                            `
+                            <li class="modal__movie-overview">
+                                <b>Описание</b>:
+                                <p>
+                                    ${data.description}
+                                </p>
+                            </li>`
                         :
-                        data.description.trim()
-                    }
-                    </p>
-                  </li>
+                        ''
+                  }
                 </ul>
                 <button type="button" class="modal__button-close">
                     <i class="fa-solid fa-xmark"></i>
