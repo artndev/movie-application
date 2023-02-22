@@ -30,6 +30,93 @@ function getClassByRate(vote) {
     }
 }
 
+
+function closeModal() {
+    modalElement.classList.remove("modal--show");
+    document.body.classList.remove("stop-scrolling");
+}
+
+
+function openModal(id) {
+    makeRequest(API_URL_DETAILS + id)
+        .then(data => {
+            console.log(data)
+            modalElement.classList.add("modal--show");
+            document.body.classList.add("stop-scrolling");
+          
+            modalElement.innerHTML = `
+              <div class="modal__card">
+                <img class="modal__movie-backdrop" src="${data.posterUrl}" alt="">
+                <h2>
+                  <span class="modal__movie-title">${data.nameRu}</span>
+                  <span class="modal__movie-release-year"> - ${data.year}г.</span>
+                </h2>
+                <ul class="modal__movie-info">
+                  <div class="loader"></div>
+                  <li class="modal__movie-genre">
+                     <b>Жанр(ы):</b> 
+                     <p>
+                        ${data.genres.map((el) => ` <span>${el.genre}</span>`)}
+                     </p>
+                  </li>
+                    ${
+                        data.filmLength 
+                        ? 
+                        `
+                        <li class="modal__movie-runtime">
+                            <b>Время:</b> ${data.filmLength} мин.
+                        </li>` 
+                        : 
+                        ''
+                    }
+                  <li>
+                    <b>Сайт:</b>
+                    <p>
+                        <a class="modal__movie-site" href="${data.webUrl}">
+                            ${data.webUrl}
+                        </a>
+                    </p>
+                  </li>
+                  ${
+                        data.description
+                        ?
+                            data.description.trim().length > 300
+                            ?
+                            `
+                            <li class="modal__movie-overview">
+                                <b>Описание</b>:
+                                <p>
+                                    ${data.description.trim().slice(0, 299)}
+                                    <a 
+                                        class="modal__movie-site" 
+                                        style="text-decoration: none;"
+                                        href="${data.webUrl}">
+                                    ...</a>
+                                </p>
+                            </li>`
+                            :
+                            `
+                            <li class="modal__movie-overview">
+                                <b>Описание</b>:
+                                <p>
+                                    ${data.description}
+                                </p>
+                            </li>`
+                        :
+                        ''
+                  }
+                </ul>
+                <button type="button" class="modal__button-close">
+                    <i class="fa-solid fa-xmark"></i>
+                </button>
+              </div>
+            `
+            const btnClose = document.querySelector(".modal__button-close");
+            btnClose.addEventListener("click", () => closeModal());
+        })
+  }
+
+
 // =================== MAIN ===================== //
 
 
@@ -93,13 +180,15 @@ function clearPagination() {
 }
 
 
-async function makeRequest(url, page = 1) {
+async function makeRequest(url, page = 0) {
     currentPage = page;
 
     console.log(`Current page -> ${currentPage}`)
     try {
         const response = 
-        await fetch(url.replace(" ", "%20") + `&page=${page}`, {
+        await fetch(
+            `${url.replace(" ", "%20")}${page !== 0 ? `&page=${page}` : ""}`, 
+            {
             method: 'GET',
             headers: {
                 'X-API-KEY': API_KEY,
@@ -167,6 +256,8 @@ function activatePagination(url, start, end) {
 
 
 
+
+
 function initializePagination(url, amount, perPage) {
         let start = 1
         let end = start + perPage - 1
@@ -176,7 +267,7 @@ function initializePagination(url, amount, perPage) {
         nextButton.removeAllEventListeners()
         previousButton.removeAllEventListeners()
 
-        nextButton.addEventListenerNew("click", () => {
+        function nextPage() {
             console.group("Next page ->")
             console.log(start, end)
             console.groupEnd()
@@ -186,10 +277,9 @@ function initializePagination(url, amount, perPage) {
         
                 activatePagination(url, start, end)
             }  
-        })
-        
+        }
 
-        previousButton.addEventListenerNew("click", () => {
+        function previousPage() {
             console.group("<- Previous page")
             console.log(start, end)
             console.groupEnd()
@@ -199,12 +289,29 @@ function initializePagination(url, amount, perPage) {
 
                 activatePagination(url, start, end)
             } 
+        }
+
+        nextButton.addEventListenerNew("click", () => {
+            nextPage()
+        })
+        
+        previousButton.addEventListenerNew("click", () => {
+            previousPage()
+        })
+
+        window.addEventListener("keypress", e => {
+            if(e.key.toLowerCase() === "e") {
+                nextPage()
+            }
+            else if(e.key.toLowerCase() === "q") {
+                previousPage()
+            }
         })
 }
 
 
 
-makeRequest(API_URL_TOP)
+makeRequest(API_URL_TOP, 1)
     .then(data => {
         showMovies(data)
         return data
@@ -223,7 +330,7 @@ form.addEventListener('submit', e => {
     e.preventDefault();
 
     if(search.value) {
-        makeRequest(API_URL_SEARCH + search.value)
+        makeRequest(API_URL_SEARCH + search.value, 1)
             .then(data => {
                 showMovies(data)
                 return data
@@ -248,3 +355,14 @@ form.addEventListener('submit', e => {
             })
     }
 });
+
+
+
+
+
+
+
+
+
+
+
