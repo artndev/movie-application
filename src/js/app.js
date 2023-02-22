@@ -84,13 +84,13 @@ function openModal(id) {
                   ${
                         data.description
                         ?
-                            data.description.trim().length > 300
+                            data.description.trim().length > 250
                             ?
                             `
                             <li class="modal__movie-overview">
-                                <b>Описание</b>:
+                                <b>Краткое описание</b>:
                                 <p>
-                                    ${data.description.trim().slice(0, 299)}
+                                    ${data.description.trim().slice(0, 249)}
                                     <a 
                                         class="modal__movie-site" 
                                         style="text-decoration: none;"
@@ -152,7 +152,7 @@ function showMovies(data) {
                         ${movie.nameRu}
                     </div>
                     <div class="movie__category">
-                        ${movie.genres.map(genre => ` ${genre.genre}`)}
+                        ${movie.genres.map(genre => ` <em>${genre.genre}</em>`)}
                     </div>
                     ${
                         movie.rating > 0 
