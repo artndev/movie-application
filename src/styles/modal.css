@@ -6,9 +6,7 @@
     top: 0;
     width: 100%;
     height: 100vh;
-    overflow: auto;
     background-color: rgba(0, 0, 0, 0.5);
-    transition: width 2s;
   }
   
   .modal--show {
@@ -18,29 +16,34 @@
   }
   
   .modal__card {
+    border-radius: 0.5vh;
+    overflow: hidden;
     background-color: #ffffff;
     max-width: 600px;
-    height: 100vh;
-    padding: 30px;
-    box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.5);
+    min-width: 50%;
+    padding: 2rem;
     background-color: #1a191f;
     color: #ffffff;
     display: flex;
     flex-direction: column;
+    align-items: center;
     gap: 1rem;
   }
   
   .modal__movie-backdrop {
-    width: 50%;
-    border-radius: 1vh;
-    box-shadow: 0 0 20px 0 rgba(0, 0, 0, 0.5);
-    margin: 0 auto
+    width: min(300px, 50vw);
+    border-radius: 0.5vh;
   }
-  
-  .modal__movie-info {
-    margin-left: 1.3rem;
-    font-size: 1em;
+
+  .modal__movie-title {
+    align-self: center;
   }
+
+  .modal__movie-overview { font-size: 1em; }
+
+  .modal__movie-info b { letter-spacing: 0.1rem; }
+
+  .modal__movie-info li { padding: 0.3rem; }
   
   .modal__button-close {
     width: 2rem;
@@ -49,24 +52,20 @@
     align-self: self-end;
     text-align: center;
     background-color: transparent;
-    color: gold;
+    color: white;
     border: white 1px solid;
-    border-radius: 1vh; 
-  }
-  
-  .modal__movie-site {
-    color: #ffd80e
-  }
-  
-  ul li {
-    padding: 5px;
-  }
-  
-  .stop-scrolling {
-    height: 100%;
-    overflow: hidden;
+    border-radius: 0.5vh; 
+    transition: transform .1s ease-in-out;
   }
 
-  p {
-    margin-top: 0.5rem;
+  .modal__button-close:hover,
+  .modal__button-close:active {
+    transform: scale(.95);
+    color: gold;
   }
+  
+  .modal__movie-site { color: #ffd80e }
+  
+  .stop-scrolling { overflow: hidden; }
+
+  p { margin-top: 0.5rem; }
