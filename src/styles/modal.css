@@ -7,67 +7,64 @@
     width: 100%;
     height: 100vh;
     background-color: rgba(0, 0, 0, 0);
-  }
+}
   
-  .modal--show {
+.modal--show {
     display: flex;
     justify-content: center;
     align-items: center;
-  }
+}
   
-  .modal__card {
+.modal__card {
     border-radius: 0.5vh;
     overflow: hidden;
-    background-color: #ffffff;
+    background-color: var(--white);
     max-width: 600px;
     min-width: 50%;
     padding: 1.5rem;
-    background-color: #1a191f;
-    color: #ffffff;
+    background-color: var(--main-color);
+    color: var(--white);
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 1rem;
-  }
+}
   
-  .modal__movie-backdrop {
+.modal__movie-backdrop {
     width: min(300px, 50vw);
     border-radius: 0.5vh;
-  }
+}
 
-  .modal__movie-title {
+.modal__movie-title {
     align-self: center;
-  }
+}
 
-  .modal__movie-overview { font-size: 1em; }
+.modal__movie-overview { font-size: 1em; }
  
-  .modal__movie-info { list-style-type: none; }
+.modal__movie-info { list-style-type: none; }
 
-  .modal__movie-info b { letter-spacing: 0.1rem; }
+.modal__movie-info b { letter-spacing: 0.1rem; }
 
-  .modal__movie-info li { padding: 0.3rem 0 0.3rem 0; }
+.modal__movie-info li { padding: 0.3rem 0 0.3rem 0; }
   
-  .modal__button-close {
+.modal__button-close {
     width: 2rem;
     height: 2rem;
     position: absolute;
+    cursor: pointer;
     align-self: self-end;
     text-align: center;
     background-color: transparent;
-    color: white;
-    border: white 1px solid;
+    color: var(--white);
+    border: var(--white) 1px solid;
     border-radius: 0.5vh; 
     transition: transform .1s ease-in-out;
-  }
+}
 
-  .modal__button-close:hover,
-  .modal__button-close:active {
-    transform: scale(.95);
-    color: gold;
-  }
-  
-  .modal__movie-site { color: #ffd80e }
-  
-  .stop-scrolling { overflow: hidden; }
+.modal__button-close:hover { color: var(--gold); }
 
-  p { margin-top: 0.5rem; }
+.modal__button-close:active { transform: scale(.95); }
+  
+.modal__movie-site { color: var(--gold) }
+  
+.stop-scrolling { overflow: hidden; }

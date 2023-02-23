@@ -1,0 +1,126 @@
+@font-face {
+    font-family: "Golos Text";
+    src: url("../fonts/Golos.woff");
+}
+
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+
+.header__content {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 2.5rem;
+    padding: 1rem;
+    height: 4rem;
+}
+
+.header__logo {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.8rem;
+    width: max-content;
+    font-size: 1.5rem;
+    text-decoration: none;
+    color: var(--white);
+}
+
+.header__search {
+    padding: 0.5rem;
+    border: 1px solid var(--white);
+    border-radius: 0.5vh;
+    outline: none;
+}
+
+
+.movies {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: space-evenly;
+    padding: 1.5rem;
+}
+
+.movie {
+    width: 15rem;
+    margin: 0.5rem;
+    position: relative;
+}
+
+.movie__cover-inner {
+    border-radius: 0.5vh;
+    position: relative;
+    height: 360px;
+}
+
+.movie__cover {
+    border-radius: 0.5vh;
+    max-width: 100%;
+    height: 100%;
+}
+
+.movie__cover--darkened {
+    border-radius: 1vh;
+    background-color: var(--black);
+    opacity: 0.1;
+    cursor: pointer;
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    max-width: 100%;
+    height: 100%;
+}
+
+.movie__cover--darkened:hover { background-color: var(--grey); }
+
+.movie__info { padding: 0.5rem 0; }
+
+.movie__title {
+    font-size: 1em;
+    color: var(--white);
+}
+.movie__category {
+    font-size: 0.9em;
+    color: var(--gold);
+}
+
+.movie__average {
+    position: absolute;
+    top: 10px;
+    left: 10px;
+    border-radius: 50%;
+    width: 2.5rem;
+    height: 2.5rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    background-color: rgba(26, 25, 31, 0.8);
+    color: var(--white);
+    font-size: 0.9em;
+}
+
+.movie__average--green { border: 2px solid var(--green); }
+
+.movie__average--orange { border: 2px solid var(--orange); }
+
+.movie__average--red { border: 2px solid var(--red); }
+
+
+.no__results {
+    color: var(--white);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-direction: column;
+    gap: 1rem;
+    font-size: 1.5rem;
+    height: 10rem;
+    margin: 2rem;
+}
+
+.emoji { font-size: 2.5em; }
