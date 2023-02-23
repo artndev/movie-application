@@ -35,12 +35,6 @@ function getClassByRate(vote) {
 // =================== MODAL ===================== //
 
 
-function closeModal() {
-    modalElement.classList.remove("modal--show");
-    document.body.classList.remove("stop-scrolling");
-}
-
-
 function openModal(id) {
     makeRequest(API_URL_DETAILS + id)
         .then(data => {
@@ -122,31 +116,36 @@ function openModal(id) {
                     backgroundColor: "rgba(0, 0, 0, 0.5)"
                 })
                 .fromTo(".modal__card", 
-                    { 
-                        duration: 0.5,
-                        ease: "none",
-                        transform: "translateY(-100vh)"
-                    },
-                    {
-                        duration: 0.5,
-                        ease: "in",
-                        transform: "translateY(0vh)"
-                    }
+                  { transform: "translateY(-100vh)" }, 
+                  {
+                    duration: 0.5,
+                    ease: "in",
+                    transform: "translateY(0vh)"
+                  } 
                 )
 
             const closeButton = document.querySelector(".modal__button-close");
+
             closeButton.addEventListener("click", () => {
                 gsap.timeline()
-                    .to(".modal__card", {
-                        duration: 0.5,
-                        ease: "out",
-                        transform: "translateY(-100vh)"
-                    })
-                    .to(".modal", {
+                    .fromTo(".modal__card",
+                      { transform: "translateY(0vh)" }, 
+                      {
                         duration: 0.3,
                         ease: "out",
+                        transform: "translateY(-100vh)"
+                      }
+                    )
+                    .to(".modal", {
+                        duration: 0.5,
+                        ease: "out",
                         backgroundColor: "rgba(0, 0, 0, 0)",
-                        onComplete: () => closeModal()
+                        onComplete: () => { 
+                            setTimeout(() => {
+                                modalElement.classList.remove("modal--show");
+                                document.body.classList.remove("stop-scrolling");
+                            }, 500) 
+                        }
                     })
             });
         })
@@ -207,7 +206,6 @@ function showMovies(data) {
 function clearPagination() {
     let _children = Array.from(paginationList.children)
 
-
     _children.forEach(el => {
         if(el.classList.contains("pagination__item--active")) {
             el.classList.remove("pagination__item--active")
@@ -219,46 +217,37 @@ function clearPagination() {
 async function makeRequest(url, page = 0) {
     currentPage = page;
 
-    console.log("Current page ->", currentPage)
     try {
-        const response = 
-        await fetch(
+        const response = await fetch (
             `${url.replace(" ", "%20")}${page !== 0 ? `&page=${page}` : ""}`, 
             {
-            method: 'GET',
-            headers: {
-                'X-API-KEY': API_KEY,
-                'Content-Type': 'application/json',
+                method: 'GET',
+                headers: {
+                    'X-API-KEY': API_KEY,
+                    'Content-Type': 'application/json',
+                }
             }
-        })
-        const data = await response.json()
-        console.group(`Answer on ${url}` + `&page=${page}`)
-        console.log(response, data)
-        console.groupEnd()
-        return data
+        )
+        return await response.json()
     }
-    catch {
-        throw new Error("A trouble was appeared with the response!")
-    }     
+    catch(err) { throw err }     
 }
 
 
 
 function displayPagination(start, end) {
     paginationList.innerHTML = ""
+
     for(let i = start; i <= end; i++) {
         const el = document.createElement("li");
+        el.classList.add("pagination__item")
         if(i === currentPage) {
-            el.classList.add(
-                "pagination__item", 
-                "pagination__item--active"
-            )
+            el.classList.add("pagination__item--active")
         }
-        else 
-            el.classList.add("pagination__item")
         el.innerText = `${String(i)}`
         paginationList.appendChild(el)
     } 
+
     return Array.from(paginationList.children)
 }
 
@@ -303,7 +292,8 @@ function initializePagination(url, amount, perPage) {
         nextButton.removeAllEventListeners()
         previousButton.removeAllEventListeners()
 
-        function nextPage() {
+
+        nextButton.addEventListenerNew("click", () => {
             console.group("Next page ->")
             console.log(start, end)
             console.groupEnd()
@@ -313,9 +303,9 @@ function initializePagination(url, amount, perPage) {
         
                 activatePagination(url, start, end)
             }  
-        }
-
-        function previousPage() {
+        })
+        
+        previousButton.addEventListenerNew("click", () => {
             console.group("<- Previous page")
             console.log(start, end)
             console.groupEnd()
@@ -325,23 +315,6 @@ function initializePagination(url, amount, perPage) {
 
                 activatePagination(url, start, end)
             } 
-        }
-
-        nextButton.addEventListenerNew("click", () => {
-            nextPage()
-        })
-        
-        previousButton.addEventListenerNew("click", () => {
-            previousPage()
-        })
-
-        window.addEventListener("keypress", e => {
-            if(e.key.toLowerCase() === "e") {
-                nextPage()
-            }
-            else if(e.key.toLowerCase() === "q") {
-                previousPage()
-            }
         })
 }
 
@@ -379,16 +352,31 @@ form.addEventListener('submit', e => {
                         pages, 
                         1
                     )
+
                     paginationWrapper.style.display = "flex"
-                    noResults.style.display = "none"
+                    gsap.fromTo(".no__results", 
+                      { transform: "translateX(0vw)" }, 
+                      {
+                        delay: 0.5,
+                        ease: "out",
+                        display: "none",
+                        transform: "translateX(-100vw)"
+                      }
+                    )
                 }
                 else {
                     paginationWrapper.style.display = "none"
-                    noResults.style.display = "flex"
+                    gsap.fromTo(".no__results", 
+                      { transform: "translateX(-100vw)" }, 
+                      {
+                        delay: 0.5,
+                        ease: "in",
+                        display: "flex",
+                        transform: "translateX(0vw)"
+                      }
+                    )
                 }
-            }).finally(() => {
-                search.value = ""
-            })
+            }).finally(() => { search.value = "" })
     }
 });
 
