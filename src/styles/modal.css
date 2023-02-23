@@ -35,10 +35,6 @@
     border-radius: 0.5vh;
 }
 
-.modal__movie-title {
-    align-self: center;
-}
-
 .modal__movie-overview { font-size: 1em; }
  
 .modal__movie-info { list-style-type: none; }
