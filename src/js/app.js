@@ -329,7 +329,7 @@ makeRequest(API_URL_TOP, 1)
 
         initializePagination(
             API_URL_TOP, 
-            pages, 
+            pages === 0 ? pages + 1 : pages, 
             1
         )
     })
@@ -346,10 +346,10 @@ form.addEventListener('submit', e => {
             }).then(data => {
                 const pages = data.pagesCount > 20 ? 20 : data.pagesCount
 
-                if(pages > 0) {
+                if(data.films.length > 0) {
                     initializePagination(
                         API_URL_SEARCH + search.value, 
-                        pages, 
+                        pages === 0 ? pages + 1 : pages, 
                         1
                     )
 
