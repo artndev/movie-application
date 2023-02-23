@@ -13,7 +13,7 @@ const modalElement = document.querySelector('.modal');
 const noResults = document.querySelector('.no__results')
 
 const paginationList = document.querySelector('.pagination__list')
-const paginationWrapper = document.querySelector('.pagination__wrapper')
+const pagination = document.querySelector('.pagination')
 
 const nextButton = document.querySelector('#next')
 const previousButton = document.querySelector('#previous')
@@ -353,7 +353,7 @@ form.addEventListener('submit', e => {
                         1
                     )
 
-                    paginationWrapper.style.display = "flex"
+                    pagination.style.display = "flex"
                     gsap.fromTo(".no__results", 
                       { transform: "translateX(0vw)" }, 
                       {
@@ -365,7 +365,7 @@ form.addEventListener('submit', e => {
                     )
                 }
                 else {
-                    paginationWrapper.style.display = "none"
+                    pagination.style.display = "none"
                     gsap.fromTo(".no__results", 
                       { transform: "translateX(-100vw)" }, 
                       {
