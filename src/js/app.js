@@ -47,7 +47,7 @@ function openModal(id) {
             console.log(`Movie with ID-${id} details =>`, data)
             modalElement.classList.add("modal--show");
             document.body.classList.add("stop-scrolling");
-          
+
             modalElement.innerHTML = `
               <div class="modal__card">
                 <img class="modal__movie-backdrop" src="${data.posterUrl}" alt="">
@@ -60,7 +60,7 @@ function openModal(id) {
                   <li class="modal__movie-genre">
                      <b>Жанр(ы):</b> 
                      <p>
-                        ${data.genres.map((el) => ` <span>${el.genre}</span>`)}
+                        ${data.genres.map((el) => ` <em>${el.genre}</em>`)}
                      </p>
                   </li>
                     ${
@@ -115,11 +115,39 @@ function openModal(id) {
                 </button>
               </div>
             `
+            gsap.timeline()
+                .to(".modal", {
+                    duration: 0.3,
+                    ease: "in",
+                    backgroundColor: "rgba(0, 0, 0, 0.5)"
+                })
+                .fromTo(".modal__card", 
+                    { 
+                        duration: 0.5,
+                        ease: "none",
+                        transform: "translateY(-100vh)"
+                    },
+                    {
+                        duration: 0.5,
+                        ease: "in",
+                        transform: "translateY(0vh)"
+                    }
+                )
+
             const closeButton = document.querySelector(".modal__button-close");
             closeButton.addEventListener("click", () => {
-                setTimeout(() => {
-                    closeModal()
-                }, 150)
+                gsap.timeline()
+                    .to(".modal__card", {
+                        duration: 0.5,
+                        ease: "out",
+                        transform: "translateY(-100vh)"
+                    })
+                    .to(".modal", {
+                        duration: 0.3,
+                        ease: "out",
+                        backgroundColor: "rgba(0, 0, 0, 0)",
+                        onComplete: () => closeModal()
+                    })
             });
         })
   }
